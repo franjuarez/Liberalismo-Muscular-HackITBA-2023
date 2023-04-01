@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frontflutter/home.dart';
-import 'package:frontflutter/providers/change_theme_provider.dart';
+import 'package:example/home.dart';
+import 'package:example/providers/change_theme_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() {

@@ -1,4 +1,4 @@
-import 'package:frontflutter/providers/change_theme_provider.dart';
+import 'package:example/providers/change_theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -86,13 +86,6 @@ class _MyHomePageState extends State<MyHomePage>
               },
             ),
             ListTile(
-              title: const Text('Cambiar usuario'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            ListTile(
               title: const Text('Cerrar sesión'),
               onTap: () {
                 // Update the state of the app.
@@ -116,7 +109,9 @@ class _MyHomePageState extends State<MyHomePage>
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Stack(
               alignment: Alignment.center,
+              
               children: [
+                // Boton Ver Cuenta
                 ElevatedButton(
                   onPressed: () {
                     _isPressed = _isPressed ? false : true;
@@ -143,8 +138,73 @@ class _MyHomePageState extends State<MyHomePage>
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _formAgregarCuenta(
-              context); ////// CHEQUEAR QUE SE HAYA MANDADO TODO OK ANTES DE AÑADIR EL BOTON
+          
+          TextEditingController nombreCuenta = TextEditingController();
+          String sNombreCuenta = '';
+          TextEditingController nombreUser = TextEditingController();
+          String sNombreUser = '';
+          TextEditingController pass = TextEditingController();
+          String sPass = '';
+
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text("Añadir cuenta"),
+                content: const Text("¿Desea añadir una nueva cuenta?"),
+                actions: <Widget>[
+                  //textoformulario
+                  TextFormField(
+                    controller: nombreCuenta,
+                    decoration: const InputDecoration(
+                      hintText: 'Servicio (ej. Facebook, Instagram, etc.)',
+                    ),
+                  ),
+
+                  TextFormField(
+                    controller: nombreUser,
+                    decoration: const InputDecoration(
+                      hintText: 'Usuario/Mail',
+                    ),
+                    onSaved: (value) {},
+                  ),
+                  TextFormField(
+                    controller: pass,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Password',
+                      hintText: 'Contraseña',
+                    ),
+                    onSaved: (value) {
+                      
+                    },
+                  ),
+
+                  TextButton(
+                    child: const Text("Cancelar"),
+                    onPressed: () {
+
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  TextButton(
+                    child: const Text("Aceptar"),
+                    onPressed: () {
+                      sNombreCuenta = nombreCuenta.text;
+                      sNombreUser = nombreUser.text;
+                      sPass = pass.text;
+                      print(sNombreCuenta);
+                      print(sNombreUser);
+                      print(sPass);
+                      paraMonke(sNombreCuenta, sNombreUser, sPass);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        
           _addButton();
         },
         tooltip: 'Añadir cuenta',
@@ -154,60 +214,8 @@ class _MyHomePageState extends State<MyHomePage>
   }
 }
 
-void _formAgregarCuenta(BuildContext context) {
-  TextEditingController nombreCuenta = TextEditingController();
-  TextEditingController nombreUser = TextEditingController();
-  TextEditingController pass = TextEditingController();
-
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text("Añadir cuenta"),
-        content: const Text("¿Desea añadir una nueva cuenta?"),
-        actions: <Widget>[
-          //textoformulario
-          TextFormField(
-            controller: nombreCuenta,
-            decoration: const InputDecoration(
-              hintText: 'Servicio (ej. Facebook, Instagram, etc.)',
-            ),
-        
-          ),
-
-          TextFormField(
-            controller: nombreUser,
-            decoration: const InputDecoration(
-              hintText: 'Usuario/Correo',
-            ),
-            onSaved: (value) {},
-          ),
-          TextFormField(
-            controller: pass,
-            obscureText: true,
-            decoration: const InputDecoration(
-              labelText: 'Password',
-              hintText: 'Contraseña',
-            ),
-            onSaved: (value) {},
-          ),
-
-          TextButton(
-            child: const Text("Cancelar"),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          TextButton(
-            child: const Text("Aceptar"),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      );
-    },
-  );
+void paraMonke(String nombreServicio, String nombreUser, String pass) {
+  
 }
 
 void _verCuenta(BuildContext context, String nombreCuenta) {
@@ -216,39 +224,33 @@ void _verCuenta(BuildContext context, String nombreCuenta) {
     builder: (BuildContext context) {
       return AlertDialog(
         title: const Text("nombreCuenta"),
-        content: const Text("¿Desea añadir una nueva cuenta?"),
+        content: const Text("Seleccione una opción sobre su cuenta:"),
         actions: <Widget>[
           ElevatedButton(
             onPressed: () {},
             style: ElevatedButton.styleFrom(
-              minimumSize: const Size(60, 35),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30.0),
-              ),
+              backgroundColor: Colors.blueGrey,
+              minimumSize: const Size(330, 40),
             ),
             child: const Text('Mostrar contraseña'),
           ),
           ElevatedButton(
             onPressed: () {},
-            child: const Text('Revisar todo'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              minimumSize: const Size(330, 40),
+            ),
+            child: const Text('Revisar vulnerabilidad'),
           ),
           ElevatedButton(
             onPressed: () {},
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              minimumSize: const Size(330, 40),
+            ),
             child: const Text('Cambiar contraseña'),
           ),
-          TextButton(
-            child: const Text("Cancelar"),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          TextButton(
-            child: const Text("Aceptar"),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
+          ],
       );
     },
   );
