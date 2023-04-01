@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'dart:ui' as ui;
 import 'package:example/providers/change_theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,7 +13,7 @@ class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
   final List<String> _buttonLabels = ['Twitter'];
   final Map<String, List> _buttonLabelsDIC = {
-    'Twitter': ['imagen', 'Valen', '66666']
+    'Twitter': ['imagen', 'Valen', '12345']
   };
 
   void _addButton(
@@ -54,7 +52,7 @@ class _MyHomePageState extends State<MyHomePage>
                 color: Colors.blue,
                 image: DecorationImage(
                   image: NetworkImage(
-                      'https://img.asmedia.epimg.net/resizer/GDyRMupWEAJLjimXNzJDVCAl2Yg=/1952x1098/cloudfront-eu-central-1.images.arcpublishing.com/diarioas/R4WQY77F7BOZZMK6ZLGWVXGG7A.jpg'),
+                      'https://www.pantallasamigas.net/wp-content/uploads/2021/05/programas-gestion-contrasenas.png'),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -125,7 +123,6 @@ class _MyHomePageState extends State<MyHomePage>
                   onPressed: () {
                     _verCuenta(context, _buttonLabels[index],
                         _buttonLabelsDIC[_buttonLabels[index]]![2]);
-                    print(_buttonLabels[index]);
                   },
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(375, 100),
@@ -231,23 +228,33 @@ void mostrarContra(BuildContext context, String contra) {
           title: const Text("Su contraseña es:"),
           content: Text(contra),
           actions: <Widget>[
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                minimumSize: const Size(330, 40),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Texto copiado al portapapeles'),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  minimumSize: const Size(330, 40),
+                ),
+                child: const Text("Copiar contraseña"),
               ),
-              child: const Text("Copiar contraseña"),
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueGrey,
-                minimumSize: const Size(330, 40),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueGrey,
+                  minimumSize: const Size(330, 40),
+                ),
+                child: const Text("Cerrar"),
               ),
-              child: const Text("Cerrar"),
             ),
           ],
         );
@@ -262,35 +269,41 @@ void _verCuenta(BuildContext context, String nombreCuenta, String pass) {
         title: Text(nombreCuenta),
         content: const Text("Seleccione una opción sobre su cuenta:"),
         actions: <Widget>[
-          ElevatedButton(
-            onPressed: () {
-              mostrarContra(context, pass);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueGrey,
-              minimumSize: const Size(330, 40),
+          Center(
+            child: ElevatedButton(
+              onPressed: () {
+                mostrarContra(context, pass);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueGrey,
+                minimumSize: const Size(330, 40),
+              ),
+              child: const Text('Mostrar contraseña'),
             ),
-            child: const Text('Mostrar contraseña'),
           ),
-          ElevatedButton(
-            onPressed: () {
-              revisarMonkeBASEdeDATOS(context, nombreCuenta);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              minimumSize: const Size(330, 40),
+          Center(
+            child: ElevatedButton(
+              onPressed: () {
+                revisarMonkeBASEdeDATOS(context, nombreCuenta);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                minimumSize: const Size(330, 40),
+              ),
+              child: const Text('Revisar vulnerabilidad'),
             ),
-            child: const Text('Revisar vulnerabilidad'),
           ),
-          ElevatedButton(
-            onPressed: () {
-              CambioContraAutomatico(context, nombreCuenta);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              minimumSize: const Size(330, 40),
+          Center(
+            child: ElevatedButton(
+              onPressed: () {
+                CambioContraAutomatico(context, nombreCuenta);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                minimumSize: const Size(330, 40),
+              ),
+              child: const Text('Cambiar contraseña'),
             ),
-            child: const Text('Cambiar contraseña'),
           ),
         ],
       );
