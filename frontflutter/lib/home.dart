@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:ui' as ui;
 import 'package:example/providers/change_theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,13 +13,16 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
-  final List<String> _buttonLabels = ['Button 1', 'Button 2', 'Button 3'];
+  final List<String> _buttonLabels = ['Twitter'];
+  final Map<String, List> _buttonLabelsDIC = {
+    'Twitter': ['imagen', 'Valen', '66666']
+  };
 
-  bool _isPressed = false;
-
-  void _addButton() {
+  void _addButton(
+      String sNombreCuenta, String imagen, String sNombreUser, String sPass) {
     setState(() {
-      _buttonLabels.add('Button ${_buttonLabels.length + 1}');
+      _buttonLabels.add(sNombreCuenta);
+      _buttonLabelsDIC[sNombreCuenta] = [imagen, sNombreUser, sPass];
     });
   }
 
@@ -44,9 +49,14 @@ class _MyHomePageState extends State<MyHomePage>
           padding: EdgeInsets.zero,
           children: <Widget>[
             const DrawerHeader(
-              child: Text('BULLMARKET PASSWORD GESTOR'),
+              child: Text(''),
               decoration: BoxDecoration(
                 color: Colors.blue,
+                image: DecorationImage(
+                  image: NetworkImage(
+                      'https://img.asmedia.epimg.net/resizer/GDyRMupWEAJLjimXNzJDVCAl2Yg=/1952x1098/cloudfront-eu-central-1.images.arcpublishing.com/diarioas/R4WQY77F7BOZZMK6ZLGWVXGG7A.jpg'),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             ListTile(
@@ -109,25 +119,21 @@ class _MyHomePageState extends State<MyHomePage>
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Stack(
               alignment: Alignment.center,
-              
               children: [
                 // Boton Ver Cuenta
                 ElevatedButton(
                   onPressed: () {
-                    _isPressed = _isPressed ? false : true;
-                    _verCuenta(context, _buttonLabels[index]);
+                    _verCuenta(context, _buttonLabels[index],
+                        _buttonLabelsDIC[_buttonLabels[index]]![2]);
                     print(_buttonLabels[index]);
                   },
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(375, 100),
                     shape: RoundedRectangleBorder(
-                      borderRadius: _isPressed
-                          ? BorderRadius.circular(10.0)
-                          : BorderRadius.circular(30.0),
-                    ),
+                        borderRadius: BorderRadius.circular(10.0)),
                   ),
                   child: Text(
-                    'Cuenta $index',
+                    '${_buttonLabels[index]} ',
                     style: const TextStyle(fontSize: 30),
                   ),
                 ),
@@ -138,7 +144,6 @@ class _MyHomePageState extends State<MyHomePage>
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          
           TextEditingController nombreCuenta = TextEditingController();
           String sNombreCuenta = '';
           TextEditingController nombreUser = TextEditingController();
@@ -175,15 +180,12 @@ class _MyHomePageState extends State<MyHomePage>
                       labelText: 'Password',
                       hintText: 'Contraseña',
                     ),
-                    onSaved: (value) {
-                      
-                    },
+                    onSaved: (value) {},
                   ),
 
                   TextButton(
                     child: const Text("Cancelar"),
                     onPressed: () {
-
                       Navigator.of(context).pop();
                     },
                   ),
@@ -193,10 +195,12 @@ class _MyHomePageState extends State<MyHomePage>
                       sNombreCuenta = nombreCuenta.text;
                       sNombreUser = nombreUser.text;
                       sPass = pass.text;
-                      print(sNombreCuenta);
-                      print(sNombreUser);
-                      print(sPass);
-                      paraMonke(sNombreCuenta, sNombreUser, sPass);
+                      // paraMonkeAgregarCuenta("Juan", sNombreCuenta, sNombreUser, sPass);
+                      if (sNombreCuenta != '' &&
+                          sNombreUser != '' &&
+                          sPass != '') {
+                        _addButton(sNombreCuenta, '', sNombreUser, sPass);
+                      }
                       Navigator.of(context).pop();
                     },
                   ),
@@ -204,8 +208,6 @@ class _MyHomePageState extends State<MyHomePage>
               );
             },
           );
-        
-          _addButton();
         },
         tooltip: 'Añadir cuenta',
         child: const Icon(Icons.add),
@@ -214,20 +216,56 @@ class _MyHomePageState extends State<MyHomePage>
   }
 }
 
-void paraMonke(String nombreServicio, String nombreUser, String pass) {
-  
+void paraMonkeAgregarCuenta(String usuarioMaestro, String nombreServicio,
+    String nombreUser, String pass) {}
+
+void revisarMonkeBASEdeDATOS(BuildContext context, String nombreCuenta) {}
+
+void CambioContraAutomatico(BuildContext context, String nombreCuenta) {}
+
+void mostrarContra(BuildContext context, String contra) {
+  showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Su contraseña es:"),
+          content: Text(contra),
+          actions: <Widget>[
+            ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                minimumSize: const Size(330, 40),
+              ),
+              child: const Text("Copiar contraseña"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueGrey,
+                minimumSize: const Size(330, 40),
+              ),
+              child: const Text("Cerrar"),
+            ),
+          ],
+        );
+      });
 }
 
-void _verCuenta(BuildContext context, String nombreCuenta) {
+void _verCuenta(BuildContext context, String nombreCuenta, String pass) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text("nombreCuenta"),
+        title: Text(nombreCuenta),
         content: const Text("Seleccione una opción sobre su cuenta:"),
         actions: <Widget>[
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              mostrarContra(context, pass);
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blueGrey,
               minimumSize: const Size(330, 40),
@@ -235,7 +273,9 @@ void _verCuenta(BuildContext context, String nombreCuenta) {
             child: const Text('Mostrar contraseña'),
           ),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              revisarMonkeBASEdeDATOS(context, nombreCuenta);
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
               minimumSize: const Size(330, 40),
@@ -243,14 +283,16 @@ void _verCuenta(BuildContext context, String nombreCuenta) {
             child: const Text('Revisar vulnerabilidad'),
           ),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              CambioContraAutomatico(context, nombreCuenta);
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
               minimumSize: const Size(330, 40),
             ),
             child: const Text('Cambiar contraseña'),
           ),
-          ],
+        ],
       );
     },
   );
