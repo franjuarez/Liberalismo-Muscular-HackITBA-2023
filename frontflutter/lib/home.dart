@@ -1,4 +1,4 @@
-import 'package:example/providers/change_theme_provider.dart';
+import 'package:frontflutter/providers/change_theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
