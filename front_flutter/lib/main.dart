@@ -3,32 +3,15 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-String user = 'Monke';
-String domain = 'Microsoft';
-String username = 'lemonke';
-String password = 'tetas12';
-
-String domain1 = 'Gugul';
-String username1 = 'monkesin';
-String password1 = 'tetas13';
-
-String user2 = 'Valen';
-String domain2 = 'Gugul';
-String username2 = 'monkesin';
-String password2 = 'tetas13';
-
-void main() {
-  addPassword(user, domain, username, password);
-  addPassword(user, domain1, username1, password1);
-  addPassword(user2, domain2, username2, password2);
+void main() { 
   runApp(const MyApp());
 }
 
-Future<void> addPassword(
-    String user, String domain, String username, String password) async {
-  var url = Uri.parse(
-      'http://10.7.17.82:8000/add_password?user=$user&domain=$domain&username=$username&password=$password');
-  var response = await http.post(url);
+// Future<void> addPassword(
+//     String user, String domain, String username, String password) async {
+//   var url = Uri.parse(
+//       'http://10.7.17.82:8000/add_password?user=$user&domain=$domain&username=$username&password=$password');
+//   var response = await http.post(url);
 
   //To check if the response is OK
   // print('Response status: ${response.statusCode}');
