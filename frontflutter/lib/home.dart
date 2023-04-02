@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'package:example/providers/change_theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:csv/csv.dart';
+import 'dart:io';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -9,18 +12,62 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+final filtradasAuxTRUE = ValueNotifier<Map<String, dynamic>>({
+  'Dropbox': ['Valen', 'asdsad'],
+  'Facebook': ['Valen', 'TengoMiedo'],
+  'Instagram': ['Valen', 'nosequeponer']
+});
+
+final Map<String, List> filtradasAuxFALSE = {
+  'Twitter': ['Valen', 'hackaton'],
+  'Facebook': ['Valen', 'a'],
+  'Instagram': ['Jumas', 'notelapuedocreer']
+};
+
+List<Map<String, List<String>>> leerCsv(String nombreArchivo) {
+  final file = File(nombreArchivo);
+  final List<List<dynamic>> filas = file
+      .openRead()
+      .transform(utf8.decoder)
+      .transform(const CsvToListConverter(fieldDelimiter: ';'))
+      .toList() as List<List>;
+
+  final List<Map<String, List<String>>> resultado = [];
+  for (final fila in filas) {
+    final dominio = fila[0].toString();
+    final usuario = fila[1].toString();
+    final contrasena = fila[2].toString();
+    resultado.add({
+      dominio: [usuario, contrasena]
+    });
+  }
+  return resultado;
+}
+
+Map<String, List> obtenerBotones(List<Map<String, List<String>>> usuarioCsv) {
+  final Map<String, List> buttonLabelsDIC = {};
+  for (final fila in usuarioCsv) {
+    final dominio = fila.keys.first;
+    final usuario = fila.values.first[0];
+    final contrasena = fila.values.first[1];
+    buttonLabelsDIC[dominio] = [usuario, contrasena];
+  }
+  return buttonLabelsDIC;
+}
+
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
-  final List<String> _buttonLabels = ['Twitter'];
+  final List<String> _buttonLabels = ['Twitter', 'Facebook', 'Instagram'];
   final Map<String, List> _buttonLabelsDIC = {
-    'Twitter': ['imagen', 'Valen', '12345']
+    'Twitter': ['Valen', '12345'],
+    'Facebook': ['Valen', 'TengoMiedo'],
+    'Instagram': ['Valen', 'nosequeponer']
   };
 
-  void _addButton(
-      String sNombreCuenta, String imagen, String sNombreUser, String sPass) {
+  void _addButton(String sNombreCuenta, String sNombreUser, String sPass) {
     setState(() {
       _buttonLabels.add(sNombreCuenta);
-      _buttonLabelsDIC[sNombreCuenta] = [imagen, sNombreUser, sPass];
+      _buttonLabelsDIC[sNombreCuenta] = [sNombreUser, sPass];
     });
   }
 
@@ -28,6 +75,21 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeChanger>(context);
+
+    filtradasAuxTRUE.addListener(() {
+      Map<String, dynamic> oldMap = filtradasAuxTRUE.value;
+      Map<String, dynamic> newMap =
+          Map.fromEntries(oldMap.entries); // make a copy of the old map
+
+      if (oldMap.toString() != newMap.toString()) {
+        print("The map has changed!");
+        print("Old values: $oldMap");
+        print("New values: $newMap");
+      }
+      // LLAMA A LA FUNCION QUE ACTUALIZA PASS
+      //cambiarContra(context, nombreCuenta, usuario, contra);
+      print('The contents of the map have changed');
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -89,7 +151,8 @@ class _MyHomePageState extends State<MyHomePage>
             ListTile(
               title: const Text('Configuración'),
               onTap: () {
-                // Update the state of the app.
+                filtradasAuxTRUE.value['Twitter'] = ['Valen', '12345'];
+
                 // ...
               },
             ),
@@ -111,18 +174,23 @@ class _MyHomePageState extends State<MyHomePage>
       ),
       body: ListView.builder(
         itemCount: _buttonLabels.length,
-        itemBuilder: (context, index) {
+        itemBuilder: (BuildContext context, index) {
           return Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Stack(
+              // crear botones con el nombre de la cuenta DESDE CSV
               alignment: Alignment.center,
               children: [
                 // Boton Ver Cuenta
                 ElevatedButton(
                   onPressed: () {
-                    _verCuenta(context, _buttonLabels[index],
-                        _buttonLabelsDIC[_buttonLabels[index]]![2]);
+                    _verCuenta(
+                        context,
+                        _buttonLabels[index],
+                        _buttonLabelsDIC[_buttonLabels[index]]![1],
+                        _buttonLabelsDIC,
+                        filtradasAuxTRUE);
                   },
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(375, 100),
@@ -196,7 +264,7 @@ class _MyHomePageState extends State<MyHomePage>
                       if (sNombreCuenta != '' &&
                           sNombreUser != '' &&
                           sPass != '') {
-                        _addButton(sNombreCuenta, '', sNombreUser, sPass);
+                        _addButton(sNombreCuenta, sNombreUser, sPass);
                       }
                       Navigator.of(context).pop();
                     },
@@ -213,12 +281,32 @@ class _MyHomePageState extends State<MyHomePage>
   }
 }
 
-void paraMonkeAgregarCuenta(String usuarioMaestro, String nombreServicio,
+void agregarCuenta(String usuarioMaestro, String nombreServicio,
     String nombreUser, String pass) {}
 
-void revisarMonkeBASEdeDATOS(BuildContext context, String nombreCuenta) {}
+void cambiarContra(
+    BuildContext context, String nombreCuenta, String usuario, String contra) {
+  print("Cambio de contraseña en: " + nombreCuenta);
+}
 
-void CambioContraAutomatico(BuildContext context, String nombreCuenta) {}
+void revisarContra(
+    BuildContext context,
+    String nombreCuenta,
+    Map<String, List<dynamic>> propias,
+    ValueNotifier<Map<String, dynamic>> filtrados) {
+  propias.forEach((key, value) {
+    if (nombreCuenta != '' && key != nombreCuenta) {
+      return;
+    }
+    filtrados.value.forEach((key2, value2) {
+      if (value[0] == value2[0] && value[1] == value2[1]) {
+        print("Cambio de contraseña en: " + key);
+      } else {
+        print("CONTRA SEGURA");
+      }
+    });
+  });
+}
 
 void mostrarContra(BuildContext context, String contra) {
   showDialog(
@@ -261,7 +349,12 @@ void mostrarContra(BuildContext context, String contra) {
       });
 }
 
-void _verCuenta(BuildContext context, String nombreCuenta, String pass) {
+void _verCuenta(
+    BuildContext context,
+    String nombreCuenta,
+    String pass,
+    Map<String, List<dynamic>> propias,
+    ValueNotifier<Map<String, dynamic>> filtrados) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -284,7 +377,8 @@ void _verCuenta(BuildContext context, String nombreCuenta, String pass) {
           Center(
             child: ElevatedButton(
               onPressed: () {
-                revisarMonkeBASEdeDATOS(context, nombreCuenta);
+                //revisarMonkeBASEdeDATOS(context, nombreCuenta);
+                revisarContra(context, nombreCuenta, propias, filtrados);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
@@ -295,9 +389,7 @@ void _verCuenta(BuildContext context, String nombreCuenta, String pass) {
           ),
           Center(
             child: ElevatedButton(
-              onPressed: () {
-                CambioContraAutomatico(context, nombreCuenta);
-              },
+              onPressed: () {},
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 minimumSize: const Size(330, 40),
