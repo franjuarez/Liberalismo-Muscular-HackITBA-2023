@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:csv/csv.dart';
 import 'dart:io';
+import 'package:http/http.dart' as http;
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -12,17 +13,11 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-final filtradasAuxTRUE = ValueNotifier<Map<String, dynamic>>({
+ValueNotifier<Map<String, dynamic>> filtradasAuxTRUE = ValueNotifier({
   'Dropbox': ['Valen', 'asdsad'],
   'Facebook': ['Valen', 'TengoMiedo'],
   'Instagram': ['Valen', 'nosequeponer']
 });
-
-final Map<String, List> filtradasAuxFALSE = {
-  'Twitter': ['Valen', 'hackaton'],
-  'Facebook': ['Valen', 'a'],
-  'Instagram': ['Jumas', 'notelapuedocreer']
-};
 
 List<Map<String, List<String>>> leerCsv(String nombreArchivo) {
   final file = File(nombreArchivo);
@@ -75,21 +70,6 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeChanger>(context);
-
-    filtradasAuxTRUE.addListener(() {
-      Map<String, dynamic> oldMap = filtradasAuxTRUE.value;
-      Map<String, dynamic> newMap =
-          Map.fromEntries(oldMap.entries); // make a copy of the old map
-
-      if (oldMap.toString() != newMap.toString()) {
-        print("The map has changed!");
-        print("Old values: $oldMap");
-        print("New values: $newMap");
-      }
-      // LLAMA A LA FUNCION QUE ACTUALIZA PASS
-      //cambiarContra(context, nombreCuenta, usuario, contra);
-      print('The contents of the map have changed');
-    });
 
     return Scaffold(
       appBar: AppBar(
@@ -284,9 +264,16 @@ class _MyHomePageState extends State<MyHomePage>
 void agregarCuenta(String usuarioMaestro, String nombreServicio,
     String nombreUser, String pass) {}
 
-void cambiarContra(
-    BuildContext context, String nombreCuenta, String usuario, String contra) {
+Future<String> MandarCuentaFiltrada(String nombreCuenta, String usuario) async {
+  var url = Uri.parse('http://localhost:8000/login');
+  var response =
+      await http.post(url, body: {'usuario': usuario, 'dominio': nombreCuenta});
+  return response.body;
+}
+
+Future<String> cambiarContra(BuildContext context, String nombreCuenta, String usuario, String contra) async {
   print("Cambio de contraseña en: " + nombreCuenta);
+  return await MandarCuentaFiltrada(nombreCuenta, usuario);
 }
 
 void revisarContra(
@@ -300,7 +287,8 @@ void revisarContra(
     }
     filtrados.value.forEach((key2, value2) {
       if (value[0] == value2[0] && value[1] == value2[1]) {
-        print("Cambio de contraseña en: " + key);
+        Future<String> passNueva = cambiarContra(context, nombreCuenta, value[0], value[1]);
+        print("Cambio de contraseña en: " + key + "contra nueva: " + passNueva.toString());
       } else {
         print("CONTRA SEGURA");
       }
